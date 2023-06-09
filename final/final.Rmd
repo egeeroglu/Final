@@ -1,0 +1,205 @@
+---
+title: "Hava Kirliliğini Etkileyen Faktörler"
+author: 
+  - Ege Eroğlu[^1]
+bibliography: ../bibliography/biblio.bib
+csl: ../csl/apa-tr.csl
+header-includes:
+  - \usepackage{polyglossia}
+  - \setmainlanguage{turkish}
+  - \usepackage{booktabs}
+  - \usepackage{caption} 
+  - \captionsetup[table]{skip=10pt}
+output:
+  bookdown::pdf_document2:
+    fig_caption: yes
+    fig_height: 3
+    fig_width: 4
+    keep_tex: no
+    latex_engine: xelatex
+    number_sections: yes
+    toc: no
+geometry: margin=1in
+link-citations: yes
+urlcolor: blue
+fontsize: 12pt
+biblio-style: apalike
+abstract: |
+  2019-2020 yılı TÜİK verileri eşliğinde,Türkiye'deki ekonomik faaliyetler yoluyla oluşan emisyon çeşitlerinin hava kirliliğine ne denli etkisi olduğu incelenmiştir. Bahsi geçen yıllardaki emisyon çeşitleri ve rakamları, projenin kaynağı olmakla birlikte hava kirliliğine çözüm üretmek konusundaki en can alıcı noktadır.
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(cache = FALSE, echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+<!-- ======================================================================= -->
+<!-- ============================== NOTLAR ================================= -->
+<!-- ======================================================================= -->
+[^1]: 19080214, [Github Repo](https://github.com/egeeroglu/Final)
+
+
+# Giriş
+Ülkemizde hava kirliliği, özellikle kış aylarında artan doğal gaz kullanımıyla insan sağlığı için ciddi bir tehdit oluşturmaktadır.Bu çalışmada iktisadi sektörlerin hava emisyonu üzerindeki etkisi araştırılmak istenmektedir. Araştırmayı destelemek için 2019-2020 yılı TÜİK verileri kullanılmıştır. Hangi iktisadi faaliyetin hava kirliliğine ne denli etkisi olduğu verilerle tespit edilirse kirliliğin doğuracağı olumsuz sonuçlara çözüm bulmak da o denli kolaylaşacaktır.
+
+## Çalışmanın Amacı
+Türkiye'de hava kirliliğine neden olan sektörleri belirleyip, bu sektörlerin hangi oranda ve hangi emisyon çeşitleriyle hava kirliliğine sebep olduklarını analiz edip, sorunlara çözüm üretmektir.
+
+## Literatür 
+İktisadi sektörlerin kâr etme isteğinin artmasıyla hava kirliliğinin artması bir paralellik göstermektedir.Firmalar daha çok kazanmak içgüdüsüyle hava kirliliğine yol açtığı dışsallıkları göz ardı etmektedir. Kârlılık isteyen sektörlerin yanında kış ayının da gelmesi Türkiye'deki hava kirliliğinin azımsanmayacak boyutlara ulaşmasına yol açmıştır[@sumer2014hava].Bu kirliliğin azaltıması için de kirliliğin ne çeşitte ve hangi gazlar yoluyla oluştuğu anlaşılmalıdır ki bu en bariz fosil yakıt kullanımıyla açıklanabilir[@bernstein2004health].Fosil yakıt kullanımı sonucunda da zararı en çok bilinen karbondioksit gazı oluşmaktadır.Atmosferde çoğunlukla oksitlenmiş formunda olan CO2 şeklinde bulunur.Normalde ekosistem karbon dengesini kendine ait bir döngü ile sağlarken fosil yakıt, sera gazı gibi maddeler bu döngüyü sekteye uğratmaktadır[@civelekouglu2018ulacsim].En gelişmiş sanayilerden biri olan Çin, bu problemi en çok yaşayan ülkelerin başında gelmektedir.Yaşanılan problemler onları çeşitli önlemler almaya itmiştir.Devlet tarafından bahsi geçen ekonomiyi araç kullanarak uygulanan önlem ise karbon vergisidir[@liu2014comparative].
+
+
+# Veri 
+2019-2020 yılları arasında TÜİK'in açıkladığı verilerde, hava kirletici emisyon çeşitleri ve bu çeşitlerin hava kirliliğine hangi oranda etki ettiği gösterilmiştir. Özet istatistiklerde bütün ekonomik faaliyetler göz önüne alınmıştır. 2019 yılında kirliliğe en çok neden olan gazlar tablo haline getirilmiştir. Sadece minimum ve maksimum değerlerinden yola çıksak bile havayı en çok kirleten emisyon çeşidinin "karbondioksit" ve "Sera Gazları" olduğunu anlamak zor olmayacaktır. Karbondioksit ve sera gazları tarafından maruz kalınan minimum kirlilik sırasıyla 130.584 ve 131.617 bu rakamlar bize gösteriyor ki hava kirliliğini azaltmanın sırrı karbondioksit ve sera gazlarıyla mücadele etmekten geçiyor.
+
+
+
+```{r results='asis', echo=FALSE}
+library(tidyverse)
+library(summarytools)
+library(readxl)
+library(xtable)
+ekonomik_faaliyetlere_gore_hava_emisyonu <- read_excel("C:/Users/ege19/OneDrive/Masaüstü/ekonomik faaliyetlere gore hava emisyonu.xls",range = "a3:t25")
+
+ekonomik_faaliyetlere_gore_hava_emisyonu <- ekonomik_faaliyetlere_gore_hava_emisyonu %>%
+  janitor::clean_names()
+ekonomik_faaliyetlere_gore_hava_emisyonu <- ekonomik_faaliyetlere_gore_hava_emisyonu %>%
+  select(-x2,
+         Sektorler = nace_rev_2_kisim_section,
+         sera_gazi_emisyonu_2019 = sera_gazi_emisyonlari_co2_esdegeri_greenhouse_gas_emissions_co2_equivalent,
+          sera_gazi_emisyonu_2020 = x4,
+         karbon_dioksit_2019 = karbon_dioksit_carbon_dioxide_co2,
+         karbon_dioksit_2020 = x6,
+         diazot_monoksit_2019 = diazot_monoksit_nitrous_oxide_n2o,
+         diazot_monoksit_2020 = x8,
+         metan_2019 = metan_methane_ch4,
+         metan_2020 = x10,
+         azot_oksitler_2019 = azot_oksitler_nitrogen_oxides_n_ox,
+         azot_oksitler_2020 = x12,
+         kukurt_oksitler_2019 = kukurt_oksitler_sulphur_oxides_s_ox,
+         kukurt_oksitler_2020 = x14,
+         amonyak_2019 = amonyak_ammonia_nh3,
+         amonyak_2020 = x16,
+         metan_disi_ucucu_organik_bilesikler_2019 = metan_disi_ucucu_organik_bilesikler_non_methane_volatile_organic_compounds_nmvo_cs,
+         metan_disi_ucucu_organik_bilesikler_2020 = x18,
+         karbon_monoksit_2019 = karbon_monoksit_carbon_monoxide_co,
+         karbon_monoksit_2020 = x20)
+
+
+
+ekonomik_faaliyetlere_gore_hava_emisyonu <- ekonomik_faaliyetlere_gore_hava_emisyonu %>%
+  filter(!is.na(Sektorler))
+st_options(lang = "tr")
+ekonomik_faaliyetlere_gore_hava_emisyonu %>% 
+  select("karbon_dioksit_2019","sera_gazi_emisyonu_2019","karbon_monoksit_2019","kukurt_oksitler_2019","metan_2019","amonyak_2019") %>%
+  descr(stats = c("mean", "sd", "min", "med", "max"), transpose = TRUE) %>%
+  xtable(caption = "Özet İstatistikler",
+         label = "tab:ozet",
+         align = c("l", "c", "c", "c", "c", "c")) %>% 
+  print(booktabs = TRUE, comment = FALSE, caption.placement = "top")
+         
+```
+
+
+# Yöntem ve Veri Analizi
+Bu bölümde veri setindeki değişkenler kullanılarak emisyon çeşitleri arasındaki bağlantıların tespit edilmesi için korelasyon katsayıları incelenmektedir. Aynı zamanda bu inceleme kovaryans analiziyle birlikte değerlendirilip sağlıklı bir çözüme ulaşabilmek amacıyla hazırlanmıştır.İlk olarak ilgili değişkenler arasındaki korelasyon ilişkileri incelenemiştir. Devamında ise kovaryans analizi yapılmıştır.
+
+Veri bölümündeki özet istatistik tablosundan ilgi odağımızın karbondioksit ve sera gazları olduğunu belirlemiştik.Sözü geçen bu gazların yayılımını azaltmak için öncelikle saçılma grafiğini incelediğimizde her iki gazında neredeyse bütün sektörlerde emisyona sebep olduğu ancak bazı sektörlerde ise çok daha fazla miktarda bir kirliliğe sebep olduğunu gözlemliyoruz.Aynı zamanda sektörlerde karbondioksit gazının artmasıyla sera gazının da artış trendine girdiğini gözlemliyoruz. dolayısıyla karbondioksit ve sera gazı arasında pozitif doğrusal bir ilişki olduğunu söyleyebiliriz.
+
+```{r ,echo=FALSE}
+ggplot(ekonomik_faaliyetlere_gore_hava_emisyonu,aes(x=karbon_dioksit_2019,y=sera_gazi_emisyonu_2019))+
+  geom_point(na.rm = TRUE, colour="blue",shape=16,size=8)
+```
+
+Bu iki değişkenin dağılım matrisini oluşturduğumuzda bir önceki saçılım grafiğinden de gördüğümüz gibi değişkenler arasında pozitif bir korelasyon vardır. Grafiklerdeki değişkenlerin dağılımlarındaki benzerlikten de bu ilişkiyi gözlemleyebiliriz.Artış ve dalgalanma hareketleri benzerlik göstermektedir.Bunlarla kalmayıp bütün bu analizlerimizi korelasyon katsayısını da göz önünde bulundurarak yaparsak ki 0.932 gibi bir değer alıp +1 değerine çok yakın seyretmektedir, pozitif korelasyonun mantıklı olduğunu belirtmiş oluruz.
+
+```{r ,echo=FALSE}
+ekonomik_faaliyetlere_gore_hava_emisyonu %>%
+  select(sera_gazi_emisyonu_2019,karbon_dioksit_2019) %>%
+  GGally::ggpairs()
+```
+
+Özet istatistik tablosunda da görüldüğü üzere minimum değeri karbondioksit ve sera gazlarından sonra en yüksek olan emisyon çeşidi karbonmonoksit gazıdır.Aşağıdaki değerler Karbonmonoksit gazının analize dahil edilmiş ve aralarında bir korelasyon katsayısı elde edilmiş değerlerini göstermektedir.
+
+```{r , echo=FALSE}
+ekonomik_faaliyetlere_gore_hava_emisyonu %>%
+  select(sera_gazi_emisyonu_2019, karbon_dioksit_2019,karbon_monoksit_2019) %>%
+  cor()
+```
+Görüldüğü üzere karbonmonoksit gazının, sera gazlarıyla ve karbondioksit gazıyla sırasıyla 0.45, 0.50 gibi bir korelasyon ilişkisi bulunmaktadır. Karbondioksit ve sera gazı arasındaki ilişki kadar kuvvetli olmasa da genel olarak en çok kirlilik saçan gazların birbirleriyle ilişkili olduğunu dolayısıyla gazların doğaya yayılımına bulunacak bir çözümün bağlantılı olarak çoğu emisyon çeşidine bir çözüm olacağı sonucuna varabiliriz.
+
+Bu bağlantı aşağıdaki ısı haritasında emisyon çeşitleri üzerinde gösterilmiştir.En çok yayılan gazların birbirleriyle ilişkili olduğunu bununla beraber diazotmonoksit ile amonyak yayılımı arasındaki ise tam bir ilişki olduğu görülmektedir.
+
+```{r  fig.width=8, fig.height=8, echo=FALSE}
+library(ggcorrplot)
+ekonomik_faaliyetlere_gore_hava_emisyonu %>%
+  select(sera_gazi_emisyonu_2019,karbon_dioksit_2019,karbon_dioksit_2019,metan_2019,diazot_monoksit_2019,kukurt_oksitler_2019,azot_oksitler_2019,amonyak_2019,metan_disi_ucucu_organik_bilesikler_2019) %>%
+  cor() %>%
+  round(2) %>%
+  ggcorrplot(hc.order = TRUE,
+             type = "lower",
+             outline.color = "white",
+             ggtheme = ggplot2::theme_minimal,
+             colors = c(scales::muted("red"),"white","steelblue"),
+             lab = TRUE)
+```
+
+
+
+Değişkenlerin korelasyon katsayılarını inceleyip ilişkilerini belirledikten sonra çalışmanın bu bölümünde kovaryans analizi yapılmaktadır. Kovaryans analizinin yapılabilmesi için ilgili değişkenlerin arasında doğrusal bir ilişki olup olmadığı belirlenmelidir. Aşağıdaki grafik bu ilişki hakkında bilgi vermektedir.
+
+
+```{r ,echo=FALSE}
+library(ggpubr)
+ggscatter(ekonomik_faaliyetlere_gore_hava_emisyonu,
+          x = "karbon_dioksit_2019",
+          y = "sera_gazi_emisyonu_2019",
+          color = "black",
+          add = "reg.line",
+          add.params = list(color="red"),
+          conf.int = FALSE,
+          cor.coef = TRUE,
+          cor.coeff.coord = c(15,1),
+          cor.method = "pearson",
+          ggtheme = theme_minimal())
+```
+
+
+
+
+
+
+Grafikten de görüldüğü üzere istisna olan birkaç gözlem haricinde değişkenler arasında doğrusal bir ilişki vardır.Kovaryans analizinin yapılabilmesi için gerekli olan doğrusallık ilişkisi sağlanmıştır. Bununla birlikte gerekli olan diğer bir koşul değişkenlerin normal dağılıma sahip olmasıdır. 
+
+```{r , echo=FALSE}
+shapiro.test(ekonomik_faaliyetlere_gore_hava_emisyonu$karbon_dioksit_2019)
+shapiro.test(ekonomik_faaliyetlere_gore_hava_emisyonu$sera_gazi_emisyonu_2019)
+```
+
+Yukarıdaki değerler normal dağılıma sahip olma koşulu olan 0.05 anlamlılık düzeyinden büyüklüğü ölçen Shapiro-Wilk testi sonucunda elde edilmiştir. 2019 yılında sektörler tarafından yayılan karbondioksit ve sera gazları, p-value değerinin 0.05 düzeyinden büyük olması sebebiyle normal dağılıma sahiptir.Şartlar sağlandıktan sonra Pearson korelasyon testi artık yapılabilmektedir.
+
+```{r ,echo=FALSE}
+cor.test(ekonomik_faaliyetlere_gore_hava_emisyonu$sera_gazi_emisyonu_2019,
+         ekonomik_faaliyetlere_gore_hava_emisyonu$karbon_dioksit_2019,
+         method = "pearson")
+```
+
+Yapılan test sonucunda "df" değeri serbestlik derecesini(19), "p-value" hipotez testine ait p değerini göstermektedir.Alternatif hipotez doğru korelasyon sıfıra eşit değildir diye verilmiştir ki bunun sonucunda da boş hipotez korelasyon sıfıra eşittir şeklinde olacaktır.
+Bir alt basamakta güven aralığı ve hesaplanan korelasyon katsayısı verilmiştir.
+0.93 korelasyon katsayısının istatistiksel olarak anlamlığını test etmek için yaptığımız bu test sonucunda p değerinin 0.05 değerinden çok daha büyük olduğunu görüyoruz ki bu sebepten ötürü boş hipotez reddedilemeyecektir.Elde edilen sonuç neticesinde korelasyon katsayısı 0.93 değerinde olmasına rağmen bu rakamın istatistiksel olarak anlamlılığı Shapiro-Wilk testiyle ölçüldüğünde boş hipotez yani korelasyonun sıfıra eşit olduğu reddedilememiştir.
+
+
+
+# Sonuç
+
+Yapılan analizler ve testler sonucunda açıkça görülüyor ki emisyon çeşitlerinin havaya yayılımında hepsi olmasa da büyük bir bölümü birbirleriyle ilişkili durumdadır.Örneğin inşaat sektörünün varlığı sonucunda doğaya sadece karbondioksit gazının yayıldığı söylenemez. 2019 yılında ülke içindeki ekonomik faaliyetlerde emisyona en çok sebep olan gazlar karbondioksit ve sera gazlarıdır. Yapılan korelasyon-kovaryans incelemeleri sonucunda birbirleriyle yakın bir ilişki halinde olduklarını açıkça görülmektedir.Bu sebeple iki gazdan biri için alınacak önlem aslında diğeri için de bir çözüm ifade etmektedir. Bu önlemlerden bazıları;
+1. Kentlerde kömür kullanımının yasaklanması
+2. Karbon vergisi sistemi oluşturulmalı
+3. Sanayi tesislerinin bacalarına filtre takılmalı, uygulanmaması halinde devlet tarafından ciddi cezalar verilmeli
+
+Çalışma sonucunda hava kirliliğine sebep olan emisyon çeşitleri incelenmiş ve birbirleriyle ilişkileri istatistiksel olarak incelenmiştir. Bu çalışmanın geliştirilmesi için daha detaylı bir veri toplanma işlemi yapılmalıdır, bu sayede yapılan istatistiksel testlerin anlamlılığı litaratürde daha geçerli olacaktır.
+
+
+
+\newpage
+# Kaynakça {#references}
+<div id="refs"></div>
+
